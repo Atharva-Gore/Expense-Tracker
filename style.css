@@ -59,4 +59,6 @@ button:hover {
 
 canvas {
   margin-top: 30px;
+  width: 200px !important;
+  height: 200px !important;
 }
