@@ -3,24 +3,22 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Expense Tracker</title>
+  <title>💰 Expense Tracker</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <h1>Expense Tracker</h1>
-  
-  <div class="form">
+
+  <div class="input-group">
     <input type="text" id="desc" placeholder="Description" />
-    <input type="number" id="amount" placeholder="Amount" />
-    <div class="btn-group">
-      <button onclick="addSalary()">Set Salary</button>
-      <button onclick="addExpense()">Add Expense</button>
-    </div>
+    <input type="number" id="amount" placeholder="Amount (₹)" />
+    <button onclick="addIncome()">Set Salary</button>
+    <button onclick="addExpense()">Add Expense</button>
   </div>
 
   <h2>Balance: ₹<span id="balance">0</span></h2>
 
-  <div id="list"></div>
+  <div id="transactions"></div>
 
   <canvas id="chart" width="300" height="300"></canvas>
 
