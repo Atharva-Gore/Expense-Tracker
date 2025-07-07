@@ -1,74 +1,77 @@
-const desc = document.getElementById("desc");
-const amount = document.getElementById("amount");
-const balance = document.getElementById("balance");
-const list = document.getElementById("list");
-
+let balance = 0;
 let transactions = [];
-let income = 0;
-let expense = 0;
 
-const chartCtx = document.getElementById("chart").getContext("2d");
-let chart = new Chart(chartCtx, {
-  type: "pie",
+const balanceEl = document.getElementById('balance');
+const transactionsEl = document.getElementById('transactions');
+const descInput = document.getElementById('desc');
+const amountInput = document.getElementById('amount');
+const ctx = document.getElementById('chart').getContext('2d');
+
+let chart = new Chart(ctx, {
+  type: 'pie',
   data: {
-    labels: ["Income", "Expense"],
+    labels: ['Income', 'Expense'],
     datasets: [{
       data: [0, 0],
-      backgroundColor: ["#2ecc71", "#e74c3c"],
+      backgroundColor: ['#00cc66', '#ff4d4d']
     }]
+  },
+  options: {
+    responsive: false
   }
 });
 
-function updateChart() {
+function updateBalance() {
+  let income = transactions
+    .filter(t => t.type === 'income')
+    .reduce((sum, t) => sum + t.amount, 0);
+  let expense = transactions
+    .filter(t => t.type === 'expense')
+    .reduce((sum, t) => sum + t.amount, 0);
+  balance = income - expense;
+  balanceEl.textContent = balance;
   chart.data.datasets[0].data = [income, expense];
   chart.update();
 }
 
 function renderTransactions() {
-  list.innerHTML = "";
-  transactions.forEach(t => {
-    const div = document.createElement("div");
-    div.className = `entry ${t.amount > 0 ? "income" : "expense"}`;
-    div.innerHTML = `${t.desc} ₹${Math.abs(t.amount)} <button onclick="removeTransaction(${t.id})">❌</button>`;
-    list.appendChild(div);
+  transactionsEl.innerHTML = '';
+  transactions.forEach((t, i) => {
+    const div = document.createElement('div');
+    div.className = `transaction ${t.type}`;
+    div.innerHTML = `
+      ${t.desc} ₹${t.amount}
+      <button onclick="deleteTransaction(${i})">❌</button>
+    `;
+    transactionsEl.appendChild(div);
   });
-
-  const total = income - expense;
-  balance.textContent = total;
-  updateChart();
 }
 
-function addSalary() {
-  const amt = parseFloat(amount.value);
-  if (!desc.value || isNaN(amt) || amt <= 0) return alert("Enter valid salary");
-
-  transactions.push({ id: Date.now(), desc: desc.value, amount: amt });
-  income += amt;
-
-  desc.value = "";
-  amount.value = "";
+function deleteTransaction(index) {
+  transactions.splice(index, 1);
   renderTransactions();
+  updateBalance();
+}
+
+function addIncome() {
+  const desc = descInput.value.trim();
+  const amount = parseFloat(amountInput.value);
+  if (!desc || isNaN(amount) || amount <= 0) return;
+  transactions.push({ desc, amount, type: 'income' });
+  descInput.value = '';
+  amountInput.value = '';
+  renderTransactions();
+  updateBalance();
 }
 
 function addExpense() {
-  const amt = parseFloat(amount.value);
-  if (!desc.value || isNaN(amt) || amt <= 0) return alert("Enter valid expense");
-
-  transactions.push({ id: Date.now(), desc: desc.value, amount: -amt });
-  expense += amt;
-
-  desc.value = "";
-  amount.value = "";
+  const desc = descInput.value.trim();
+  const amount = parseFloat(amountInput.value);
+  if (!desc || isNaN(amount) || amount <= 0) return;
+  transactions.push({ desc, amount, type: 'expense' });
+  descInput.value = '';
+  amountInput.value = '';
   renderTransactions();
+  updateBalance();
 }
-
-function removeTransaction(id) {
-  const index = transactions.findIndex(t => t.id === id);
-  if (index !== -1) {
-    const t = transactions[index];
-    if (t.amount > 0) income -= t.amount;
-    else expense -= Math.abs(t.amount);
-    transactions.splice(index, 1);
-    renderTransactions();
-  }
-}
+ 
